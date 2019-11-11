@@ -55,17 +55,16 @@ class API
 
     /** Builds an URL to access an eWON using the M2Web API*/
     function buildEwonUrl($ewonPath, $params) {
-        $allParams = array_merge($params, $this->ewonConfig);
+        $allParams = array_merge($params, $this->ewonConfig, $this->accountConfig);
         return $this->buildUrl ( "get/" . $this->ewonConfig['ewonName'] . "/" . $ewonPath, $allParams );
     }
 
     /** Call an API on the portal */
     function callApi($url) {
-
         $client = new Client();
         try {
             $response = $client->request('GET', $url);
-            $response = $response->getBody();
+            $response = $response->getBody()->getContents();
         } catch (GuzzleException $e) {
             $response = $e->getMessage();
         }
@@ -149,7 +148,7 @@ class API
     }
 
     /** takes a CSV file (where the first line contains the column names)
-     * and returns an array of associative arrays
+     * and returns a collection of collections
      * E.g.:
      * 		"name";"id"
      * 		"EwonName";1
@@ -159,7 +158,12 @@ class API
      * 		[ "name" => "FlexyName" , "id" => 2 ] ]
      *
      */
-    function transformCsv($csv, $itemName) {
+    /**
+     * @param $csv
+     *
+     * @return array|\Illuminate\Support\Collection
+     */
+    function transformCsv($csv) {
         $parsed = $this->parseCsv($csv);
         if (empty($parsed)) {
             return array();
@@ -167,17 +171,12 @@ class API
 
         $columnNames = array_shift($parsed);
 
-        $result = array();
-
-        foreach($parsed as $line) {
-            $columnId = 0;
-            $tag = array();
-            foreach($line as $column) {
-                $tag[$columnNames[$columnId]] = $column;
-                $columnId++;
-            }
-            $result[$tag[$itemName]] = $tag;
-        }
+        $result = collect($parsed)->map(function($line) use ($columnNames) {
+            $line = collect($line);
+            return $line->mapWithKeys( function ( $item, $key ) use ( $columnNames ) {
+                return [$columnNames[$key] => $item];
+            } );
+        });
 
         return $result;
     }
