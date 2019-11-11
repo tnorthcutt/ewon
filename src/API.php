@@ -49,14 +49,14 @@ class API
 
     /** Builds an URL to access the M2Web API of the portal */
     function buildUrl($action, $params) {
-        $query = http_build_query(array_merge($this->config, $params));
+        $query = http_build_query(array_merge($this->accountConfig, $this->ewonConfig, $params));
         return $this->apiUrl . $action . "?" . $query;
     }
 
     /** Builds an URL to access an eWON using the M2Web API*/
     function buildEwonUrl($ewonPath, $params) {
         $allParams = array_merge($params, $this->ewonConfig);
-        return $this->buildUrl ( "get/" . $this->ewonConfig['name'] . "/" . $ewonPath, $allParams );
+        return $this->buildUrl ( "get/" . $this->ewonConfig['ewonName'] . "/" . $ewonPath, $allParams );
     }
 
     /** Call an API on the portal */

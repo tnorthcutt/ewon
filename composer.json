@@ -19,13 +19,6 @@
             "tnorthcutt\\Ewon\\": "src/"
         }
     },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "tnorthcutt\\Ewon\\EwonServiceProvider"
-            ]
-        }
-    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
