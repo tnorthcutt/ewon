@@ -56,7 +56,7 @@ class API
     /** Builds an URL to access an eWON using the M2Web API*/
     function buildEwonUrl($ewonPath, $params) {
         $allParams = array_merge($params, $this->ewonConfig, $this->accountConfig);
-        return $this->buildUrl ( "get/" . $this->ewonConfig['ewonName'] . "/" . $ewonPath, $allParams );
+        return $this->buildUrl ( "get/" . $this->ewonConfig['name'] . "/" . $ewonPath, $allParams );
     }
 
     /** Call an API on the portal */
@@ -109,7 +109,7 @@ class API
 
     /** parses an eWON 'csv' file */
     function parseCsv($csv) {
-        $lines  = explode("\n", $csv);
+        $lines  = explode("\r\n", $csv);
         $result = array();
         foreach($lines as $line) {
             if (!empty($line)) {
@@ -184,8 +184,8 @@ class API
     /** Returns information about one eWON in the following form :
      * {"id":173711,"name":"Flexy_02","encodedName":"Flexy_02","status":"online","description":"","customAttributes":["","",""],"m2webServer":"m2web.talk2m.com","lanDevices":[],"ewonServices":[]}
      */
-    function getEwon($ewonName) {
-        $result = $this->callJsonApi($this->buildUrl("getewon", array("name" => $ewonName)));
+    function getEwon($name) {
+        $result = $this->callJsonApi($this->buildUrl("getewon", array("name" => $name)));
         if ($result) {
             return $result->ewon;
         } else {
